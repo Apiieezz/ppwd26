@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Praktikum jQuery - Fitur Lengkap</title>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header-title { color: #ffffff; text-align: center; margin-bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        .container {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card { 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px; 
+            padding: 30px; 
+            width: 100%;
+            max-width: 320px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        .card h2, .card h3 { margin-top: 0; color: #1a202c; font-weight: 600; }
+        .card p { color: #718096; font-size: 14px; margin-bottom: 15px; }
+
+        label { font-size: 13px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
+        input { 
+            width: 100%; padding: 10px 12px; margin-bottom: 8px;
+            background-color: #f7fafc; border: 2px solid #e2e8f0; 
+            border-radius: 8px; font-family: 'Poppins', sans-serif; font-size: 13px;
+        }
+        input:focus { border-color: #667eea; outline: none; }
+
+        button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 10px 15px; 
+            border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+            transition: all 0.3s ease; width: 100%; margin-bottom: 10px;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4); }
+
+        .btn-add { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        
+        .error { color: #e53e3e; font-size: 12px; display: none; margin-bottom: 10px; font-weight: 600; }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); display: none;
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 350px; }
+
+        .total-price { font-size: 18px; font-weight: 600; color: #2d3748; margin: 15px 0; background: #edf2f7; padding: 10px; border-radius: 8px; text-align: center;}
+        .dicoret { text-decoration: line-through; color: #e53e3e; font-size: 14px; font-weight: 400;}
+    </style>
+</head>
+<body>
+
+    <div class="header-title">
+        <h1>Tugas Praktikum jQuery</h1>
+        <p>Interaksi DOM, Validasi Form & Fitur Cart E-Commerce</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="card" id="profileCard">
+            <h2 id="profileName">Budi Santoso</h2>
+            <p>Web Developer & jQuery Enthusiast</p>
+            <button id="btnGantiNama">Ganti Nama</button>
+            <button class="btn-add" id="btnAnimasi">Efek Animasi</button>
+        </div>
+
+        <div class="card">
+            <h3>Keranjang Belanja</h3>
+            <button class="btn-add" id="btnBeliKemeja">Tambah Kemeja (Rp 60.000)</button>
+            <button class="btn-add" id="btnBeliTas">Tambah Tas (Rp 50.000)</button>
+            
+            <div class="total-price" id="cartTotal">Rp 0</div>
+            
+            <button id="btnCheckout">Checkout Sekarang</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h3>Data Pengiriman</h3>
+            <label>Nama Lengkap</label>
+            <input type="text" id="buyerName" placeholder="Contoh: Budi Santoso">
+            
+            <label>Alamat Lengkap</label>
+            <input type="text" id="buyerAddress" placeholder="Contoh: Jl. Merdeka No. 1">
+            
+            <label>Nomor HP</label>
+            <input type="number" id="buyerPhone" placeholder="Contoh: 08123456789">
+            
+            <div class="error" id="checkoutError">⚠️ Lengkapi data dengan benar (Nama min 3, Alamat min 5, HP min 10 karakter)</div>
+            
+            <button id="btnConfirmPay">Konfirmasi & Bayar</button>
+            <button id="btnCancel" style="background: #e2e8f0; color: #4a5568;">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {$('#btnGantiNama').click(function() {
+                $('#profileName').text('Rina Wijaya').css({'color': '#667eea'});
+            });
+            $('#btnAnimasi').click(function() {
+                $('#profileCard').fadeOut(300).fadeIn(600).slideUp(200).slideDown(300);
+            });
+
+            let cart = []; 
+
+            $('#btnBeliKemeja').click(() => { cart.push({ harga: 60000, qty: 1 }); updateCartUI(); });
+            $('#btnBeliTas').click(() => { cart.push({ harga: 50000, qty: 1 }); updateCartUI(); });
+
+            function updateCartUI() {
+                let totalHarga = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+                
+                if (totalHarga > 100000) {
+                    const diskon = totalHarga * 0.1; 
+                    let hargaSetelahDiskon = totalHarga - diskon;
+                    
+                    $('#cartTotal').html(`
+                        <span class="dicoret">Rp ${totalHarga.toLocaleString('id-ID')}</span><br>
+                        <span style="color: #38a169;">Rp ${hargaSetelahDiskon.toLocaleString('id-ID')} (Diskon 10%)</span>
+                    `);
+                } else {
+                    $('#cartTotal').html(`Rp ${totalHarga.toLocaleString('id-ID')}`);
+                }
+            }
+
+            function simpanRiwayat(total, qty) {
+                const riwayat = JSON.parse(localStorage.getItem('riwayat')) || [];
+                riwayat.push({ tanggal: new Date().toISOString(), total: total, qty: qty });
+                localStorage.setItem('riwayat', JSON.stringify(riwayat));
+            }
+
+            $('#btnCheckout').click(() => {
+                if (cart.length === 0) {
+                    alert('Keranjang belanja masih kosong!');
+                    return;
+                }
+                $('#modalOverlay').css('display', 'flex').hide().fadeIn();
+            });
+
+            $('#btnCancel').click(() => { $('#modalOverlay').fadeOut(); });
+
+            $('#btnConfirmPay').click(() => {
+                let nama = $('#buyerName').val().trim();
+                let alamat = $('#buyerAddress').val().trim();
+                let hp = $('#buyerPhone').val().trim();
+
+                if (nama.length < 3 || alamat.length < 5 || hp.length < 10) {
+                    $('#checkoutError').slideDown();
+                    return;
+                }
+                $('#checkoutError').slideUp();
+
+                let totalHarga = cart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+                let finalTotal = totalHarga > 100000 ? totalHarga - (totalHarga * 0.1) : totalHarga;
+                let totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+
+                simpanRiwayat(finalTotal, totalQty);
+
+                alert(`Berhasil! Pembayaran Rp ${finalTotal.toLocaleString('id-ID')} sukses.\nRiwayat telah disimpan ke localStorage.`);
+                
+                cart = []; 
+                updateCartUI();
+                $('#buyerName').val(''); $('#buyerAddress').val(''); $('#buyerPhone').val('');
+                $('#modalOverlay').fadeOut();
+            });
+        });
+    </script>
+</body>
+</html>
