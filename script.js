@@ -1,55 +1,30 @@
-<!DOCTYPE html> 
-<html lang="id"> 
-<head> 
-  <meta charset="UTF-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1">   <title>Portofolio Yan</title> 
+// ===== 1. Mode gelap / terang ===== 
+// Ambil tombol dari HTML berdasarkan id-nya 
+const tombolTema = document.getElementById("tombol-tema"); 
  
-  <!-- Menghubungkan file CSS --> 
-  <link rel="stylesheet" href="style.css"> 
-</head> 
-<body> 
+// Saat tombol diklik, tambah/hapus class "gelap" pada <body> tombolTema.addEventListener("click", function () {   document.body.classList.toggle("gelap"); 
  
-  <!-- ===== Bagian atas ===== --> 
-  <header class="header"> 
-    <h2 class="logo">Yan</h2> 
-    <button id="tombol-tema">Mode gelap</button> 
-  </header> 
+  // Ubah tulisan tombol sesuai mode yang sedang aktif   if (document.body.classList.contains("gelap")) {     tombolTema.textContent = "Mode terang"; 
+  } else { 
+    tombolTema.textContent = "Mode gelap"; 
+  } 
+}); 
  
-  <main class="isi"> 
+// ===== 2. Pencarian proyek ===== const kotakCari = document.getElementById("cari"); const semuaKartu = document.querySelectorAll(".kartu"); 
+const pesanKosong = document.getElementById("pesan-kosong"); 
  
-    <!-- ===== Perkenalan ===== --> 
-    <section class="perkenalan"> 
-      <h1>Halo, saya Yan.</h1> 
-      <p>Mahasiswa Sistem Informasi yang suka membuat aplikasi web.</p>     </section> 
+// Dijalankan setiap kali pengguna mengetik di kotak pencarian kotakCari.addEventListener("input", function () {   const kataKunci = kotakCari.value.toLowerCase();   let adaYangCocok = false; 
  
-    <!-- ===== Daftar proyek ===== --> 
-    <h2>Proyek saya</h2> 
+  // Periksa kartu satu per satu   semuaKartu.forEach(function (kartu) {     const isiKartu = kartu.textContent.toLowerCase(); 
  
-    <!-- Kotak pencarian (dipakai oleh script.js) --> 
-    <input type="text" id="cari" placeholder="Cari proyek..."> 
+    if (isiKartu.includes(kataKunci)) {       kartu.style.display = "block";   // tampilkan 
+      adaYangCocok = true; 
+    } else { 
+      kartu.style.display = "none";    // sembunyikan 
+    } 
+  }); 
  
-    <section class="daftar-proyek"> 
- 
-      <!-- Satu kartu = satu proyek. 
-           href mengarah ke index.html di dalam folder proyek tersebut. --> 
-      <a class="kartu" href="buku-tamu-digital/index.html"> 
-        <h3>Buku Tamu Digital</h3> 
-        <p>Formulir pencatatan tamu kantor.</p>       </a> 
- 
-      <a class="kartu" href="mav-platform/index.html"> 
-        <h3>MAV Platform</h3> 
-        <p>Menu berbeda untuk setiap peran pengguna.</p> 
-      </a> 
- 
-      <!-- Mau menambah proyek? Salin satu blok <a class="kartu"> di atas,            lalu ubah href, judul, dan deskripsinya. --> 
- 
-    </section> 
- 
-    <p id="pesan-kosong" class="pesan-kosong">Proyek tidak ditemukan.</p> 
- 
-  </main> 
- 
-  <!-- Menghubungkan file JavaScript (letakkan paling bawah) --> 
-  <script src="script.js"></script> 
-</body> 
-</html> 
+  // Tampilkan pesan jika tidak ada kartu yang cocok   if (adaYangCocok) {     pesanKosong.style.display = "none";   } else { 
+    pesanKosong.style.display = "block"; 
+  } 
+}); 
